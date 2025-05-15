@@ -17,12 +17,11 @@ private:
 public:
     User(int id);
 
-    std::string getUserDetails(sql::Connection* con);
-    std::vector<BorrowedBook> getBorrowedBooks(sql::Connection* con);
-    std::vector<BorrowedBook> getOverdueBooks(sql::Connection* con);
-    std::vector<Book> getAvailableBooks(sql::Connection* con);
-    double getTotalFine(sql::Connection* con);
-    std::vector<Book> getAvailableBooks(sql::Connection* con);
+    void getUserDetails(std::function<void(std::string)> showMessage, std::function<void(Account)> displayAccount);
+    void getBorrowedBooks(std::function<void(BorrowedBook)> displayBorrowedBook, std::function<void(std::string)> showMessage);
+    void getOverdueBooks(std::function<void(BorrowedBook)> displayOverdueBook, std::function<void(std::string)> showMessage);
+    void getAvailableBooks(std::function<void(Book)> displayBook, std::function<void(std::string)> showMessage);
+    void getTotalFine(std::function<void(double)> displayTotalFine, std::function<void(std::string)> showMessage);
 };
 
 #endif
