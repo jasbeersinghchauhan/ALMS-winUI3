@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <functional>
 #include <cppconn/connection.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
@@ -30,9 +31,9 @@ public:
 
     void revertBorrowedBook(int accountId, int bookId);
 
-    std::vector<BorrowedBook> getAllBorrowedBooks();
+    std::vector<BorrowedBook> getAllBorrowedBooks(std::function<void(std::string)> showMessage);
 
-    std::vector<BorrowedBook> getBorrowedBooksByUserID(int userId);
+    std::vector<BorrowedBook> getBorrowedBooksByUserID(int userId, std::function<void(std::string)> showMessage);
 
     std::string markAsReturned(int borrowId);
 
