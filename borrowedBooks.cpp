@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "borrowedBooks.h"
 #include <stdexcept>
 #include <cppconn/prepared_statement.h>
@@ -18,7 +19,7 @@ bool BorrowedBooksManager::isBookAvailable(int bookId) {
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
         return res->next() && res->getInt(1) > 0;
     }
-    catch (...) {
+    catch (const sql::SQLException&) {
         return false;
     }
 }
@@ -30,16 +31,35 @@ std::string BorrowedBooksManager::addBorrowedBook(int accountId, int bookId) {
     }
 
     try {
-        std::unique_ptr<sql::PreparedStatement> pstmt(
-            conn->prepareStatement("INSERT INTO borrowed_books (account_id, book_id) VALUES (?, ?)")
-        );
-        pstmt->setInt(1, accountId);
-        pstmt->setInt(2, bookId);
-        pstmt->executeUpdate();
-        return "Book borrowed successfully.";
+        conn->setAutoCommit(false); 
+        {
+            std::unique_ptr<sql::PreparedStatement> pstmt(
+                conn->prepareStatement("INSERT INTO borrowed_books (account_id, book_id, borrow_date, returned) VALUES (?, ?, NOW(), FALSE)")
+            );
+            pstmt->setInt(1, accountId);
+            pstmt->setInt(2, bookId);
+            pstmt->executeUpdate();
+        }
+        {
+            std::unique_ptr<sql::PreparedStatement> pstmt(
+                conn->prepareStatement("UPDATE books SET available = FALSE WHERE book_id = ?")
+            );
+            pstmt->setInt(1, bookId);
+            int updatedRows = pstmt->executeUpdate();
+            if (updatedRows == 0) {
+                conn->rollback();
+                return "Failed to mark book as unavailable.";
+            }
+        }
+
+        conn->commit();
+        conn->setAutoCommit(true);
+        return "success";
     }
-    catch (sql::SQLException& e) {
-        revertBorrowedBook(accountId, bookId);
+    catch (const sql::SQLException& e) {
+        try { conn->rollback(); }
+        catch (...) {}
+        conn->setAutoCommit(true);
         return "Borrowing failed: " + std::string(e.what());
     }
 }
@@ -58,7 +78,7 @@ void BorrowedBooksManager::revertBorrowedBook(int accountId, int bookId) {
 }
 
 // Get all borrowed books (Admin view)
-std::vector<BorrowedBook> BorrowedBooksManager::getAllBorrowedBooks() {
+std::vector<BorrowedBook> BorrowedBooksManager::getAllBorrowedBooks(std::function<void(std::string)> showMessage) {
     std::vector<BorrowedBook> books;
     try {
         std::unique_ptr<sql::PreparedStatement> pstmt(
@@ -74,17 +94,25 @@ std::vector<BorrowedBook> BorrowedBooksManager::getAllBorrowedBooks() {
             b.borrowDate = res->getString("borrow_date");
             b.returnDate = res->isNull("return_date") ? "" : res->getString("return_date");
             b.returned = res->getBoolean("returned");
-            books.push_back(b);
+            books.emplace_back(std::move(b));
         }
     }
-    catch (...) {
-        // Optionally handle/log
+    catch (const sql::SQLException& e) {
+        if (showMessage) {
+            showMessage("Error fetching borrowed books: " + std::string(e.what()));
+        }
+    }
+    catch (const std::exception& e) {
+        if (showMessage) {
+            showMessage("Unexpected error: " + std::string(e.what()));
+        }
     }
     return books;
 }
 
+
 // Get borrowed books for a specific user
-std::vector<BorrowedBook> BorrowedBooksManager::getBorrowedBooksByUserID(int userId) {
+std::vector<BorrowedBook> BorrowedBooksManager::getBorrowedBooksByUserID(int userId, std::function<void(std::string)> showMessage) {
     std::vector<BorrowedBook> books;
     try {
         std::unique_ptr<sql::PreparedStatement> pstmt(
@@ -101,15 +129,22 @@ std::vector<BorrowedBook> BorrowedBooksManager::getBorrowedBooksByUserID(int use
             b.borrowDate = res->getString("borrow_date");
             b.returnDate = res->isNull("return_date") ? "" : res->getString("return_date");
             b.returned = res->getBoolean("returned");
-            books.push_back(b);
+            books.emplace_back(std::move(b));
         }
     }
-    catch (...) {
-        // Optionally handle/log
+    catch (const sql::SQLException& e) {
+        if (showMessage) {
+            showMessage("SQL error in getBorrowedBooksByUserID: " + std::string(e.what()));
+        }
     }
-
+    catch (const std::exception& e) {
+        if (showMessage) {
+            showMessage("Error in getBorrowedBooksByUserID: " + std::string(e.what()));
+        }
+    }
     return books;
 }
+
 
 // Mark a book as returned
 std::string BorrowedBooksManager::markAsReturned(int borrowId) {
