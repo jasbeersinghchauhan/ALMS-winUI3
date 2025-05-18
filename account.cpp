@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "account.h"
 #include <iostream>
 #include <set>
@@ -63,10 +64,10 @@ std::string Account::insertAccount(sql::Connection* con) {
 
         int affectedRows = pstmt->executeUpdate();
         if (affectedRows == 0) {
-            return "Insert skipped: Account with email " + email + "' already exists.";
+            return "Insert skipped: Account with email '" + email + "' already exists.";
         }
         else {
-            return  "Account inserted successfully.";
+            return "Account inserted successfully.";
         }
     }
     catch (sql::SQLException& e) {
@@ -136,7 +137,7 @@ std::string Account::deleteAccount(sql::Connection* con) {
 
         int affected = pstmt->executeUpdate();
         if (affected == 0) {
-            return "No account found with the given email";
+            return "No account found with the given email.";
         }
         else {
             return "Account deleted successfully.";
@@ -160,7 +161,7 @@ std::string Account::searchAccountByEmail(sql::Connection* con) {
             return "Account found.";
         }
         else {
-            return "No account found with that email";
+            return "No account found with that email.";
         }
     }
     catch (sql::SQLException& e) {
@@ -181,7 +182,7 @@ std::string Account::searchAccountByID(sql::Connection* con) {
             return "Account found.";
         }
         else {
-            return "No account found with that ID";
+            return "No account found with that ID.";
         }
     }
     catch (sql::SQLException& e) {
