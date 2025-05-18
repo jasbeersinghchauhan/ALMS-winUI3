@@ -1,11 +1,28 @@
+#include "pch.h"
 #include "book.h"
 #include <iostream>
 #include <cppconn/prepared_statement.h>
 
 Book::Book() : year(0), quantity(0) {}
-Book::Book(std::string isbn) : year(0), quantity(0), isbn(isbn) {}
-Book::Book(std::string title, std::string author, std::string isbn, int year, int quantity)
-    : title(std::move(title)), author(std::move(author)), isbn(std::move(isbn)), year(year), quantity(quantity) {
+Book::Book(const std::string& title, const std::string& author, const std::string& isbn, int year, int quantity)
+    : title(title), author(author), isbn(isbn), year(year), quantity(quantity) {
+}
+Book Book::fromTitle(const std::string& title) {
+    Book b;
+    b.title = title;
+    return b;
+}
+
+Book Book::fromAuthor(const std::string& author) {
+    Book b;
+    b.author = author;
+    return b;
+}
+
+Book Book::fromISBN(const std::string& isbn) {
+    Book b;
+    b.isbn = isbn;
+    return b;
 }
 
 // --- Setters ---
@@ -47,9 +64,14 @@ std::string Book::insertBook(sql::Connection* con) {
         return "Book inserted successfully.";
     }
     catch (sql::SQLException& e) {
-        return "Insert failed: " + std::string(e.what());
+        std::string errorMsg = e.what();
+        if (errorMsg.find("Duplicate") != std::string::npos) {
+            return "Insert failed: Book with this ISBN already exists.";
+        }
+        return "Insert failed: " + errorMsg;
     }
 }
+
 
 
 std::string Book::updateBook(sql::Connection* con) {
@@ -81,68 +103,80 @@ std::string Book::deleteBook(sql::Connection* con) {
         if (affected == 0) {
             return "No book found with the given ISBN.";
         }
-        return "Book deleted successfully";
+        return "Book deleted successfully.";
     }
     catch (sql::SQLException& e) {
         return "Delete failed: " + std::string(e.what());
     }
 }
 
-std::string Book::searchBookByISBN(sql::Connection* con) {
+
+std::vector<Book> Book::searchBooksByISBN(sql::Connection* con) {
+    std::vector<Book> results;
     try {
         std::unique_ptr<sql::PreparedStatement> pstmt(
             con->prepareStatement("SELECT * FROM books WHERE isbn = ?"));
         pstmt->setString(1, isbn);
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
-        if (res->next()) {
-            loadFromResultSet(res.get());
-        }
-        else {
-            return "No book found with that ISBN.";
+
+        while (res->next()) {
+            Book book;
+            book.loadFromResultSet(res.get());
+            results.push_back(book);
         }
     }
-    catch (sql::SQLException& e) {
-        return "Search failed: " + std::string(e.what());
+    catch (const sql::SQLException&) {
+        throw;
     }
+
+    return results;
 }
 
-std::string Book::searchBookByTitle(sql::Connection* con) {
+
+std::vector<Book> Book::searchBooksByTitle(sql::Connection* con) {
+    std::vector<Book> results;
     try {
         std::unique_ptr<sql::PreparedStatement> pstmt(
             con->prepareStatement("SELECT * FROM books WHERE title = ?"));
         pstmt->setString(1, title);
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
-        if (res->next()) {
-            loadFromResultSet(res.get());
-        }
-        else {
-            return "No book found with that title";
+
+        while (res->next()) {
+            Book book;
+            book.loadFromResultSet(res.get());
+            results.push_back(book);
         }
     }
-    catch (sql::SQLException& e) {
-        return "Search failed : " + std::string(e.what());
+    catch (const sql::SQLException&) {
+        throw;
     }
+
+    return results;
 }
 
-std::string Book::searchBookByAuthor(sql::Connection* con) {
+
+std::vector<Book> Book::searchBooksByAuthor(sql::Connection* con) {
+    std::vector<Book> results;
     try {
         std::unique_ptr<sql::PreparedStatement> pstmt(
             con->prepareStatement("SELECT * FROM books WHERE author = ?"));
-        pstmt->setString(1, author);
+        pstmt->setString(1, Book::author);
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
-        if (res->next()) {
-            loadFromResultSet(res.get());
-        }
-        else {
-            return "No book found with that author";
+
+        while (res->next()) {
+            Book book;
+            book.loadFromResultSet(res.get());
+            results.push_back(book);
         }
     }
-    catch (sql::SQLException& e) {
-        return "Search failed: " + std::string(e.what());
+    catch (const sql::SQLException&) {
+        throw;
     }
+    return results;
 }
 
-std::vector<Book> Book::displayAllBooks(sql::Connection* con) {
+
+std::vector<Book> Book::displayAllBooks(sql::Connection* con, std::string& error) {
     std::vector<Book> books;
     try {
         std::unique_ptr<sql::PreparedStatement> pstmt(
@@ -156,7 +190,7 @@ std::vector<Book> Book::displayAllBooks(sql::Connection* con) {
         mergeSort(books);
     }
     catch (sql::SQLException& e) {
-        std::cerr << "Display failed: " << e.what() << std::endl;
+        error = "Display failed: " + std::string(e.what());
     }
     return books;
 }
@@ -190,7 +224,7 @@ std::vector<Book> Book::getPaginatedBooks(sql::Connection* con, int pageNumber, 
 }
 
 
-std::vector<Book> Book::getAvailableBooks(sql::Connection* con) {
+std::vector<Book> Book::getAvailableBooks(sql::Connection* con, std::string& error) {
     std::vector<Book> books;
     try {
         std::unique_ptr<sql::PreparedStatement> pstmt(con->prepareStatement(
@@ -209,88 +243,66 @@ std::vector<Book> Book::getAvailableBooks(sql::Connection* con) {
         }
     }
     catch (sql::SQLException& e) {
-        std::cerr << "Error fetching available books: " << e.what() << std::endl;
+        error = e.what();
     }
     return books;
 }
 
+
+// --- Sorting Algorithms ---
 void Book::mergeSort(std::vector<Book>& books) {
     mergeSortHelper(books, 0, books.size() - 1);
 }
 
-void Book::mergeSortHelper(std::vector<Book>& books, int left, int right) {
+void Book::mergeSortHelper(std::vector<Book>& books, size_t left, size_t right) {
     if (left < right) {
-        int mid = left + (right - left) / 2;
+        size_t mid = left + (right - left) / 2;
         mergeSortHelper(books, left, mid);
         mergeSortHelper(books, mid + 1, right);
         mergeHelper(books, left, mid, right);
     }
 }
 
-void Book::mergeHelper(std::vector<Book>& books, int left, int mid, int right) {
-    int n1 = mid - left + 1;
-    int n2 = right - mid;
+
+void Book::mergeHelper(std::vector<Book>& books, size_t left, size_t mid, size_t right) {
+    size_t n1 = mid - left + 1;
+    size_t n2 = right - mid;
 
     std::vector<Book> leftBooks(n1);
     std::vector<Book> rightBooks(n2);
 
-    for (int i = 0; i < n1; ++i) {
+    for (size_t i = 0; i < n1; ++i) {
         leftBooks[i] = books[left + i];
     }
-    for (int i = 0; i < n2; ++i) {
+    for (size_t i = 0; i < n2; ++i) {
         rightBooks[i] = books[mid + 1 + i];
     }
 
-    int i = 0, j = 0, k = left;
+    size_t i = 0, j = 0, k = left;
     while (i < n1 && j < n2) {
-        if (leftBooks[i].getTitle() < rightBooks[j].getTitle()) {
-            books[k] = leftBooks[i];
-            ++i;
+        std::string leftTitle = leftBooks[i].getTitle();
+        std::string rightTitle = rightBooks[j].getTitle();
+        std::transform(leftTitle.begin(), leftTitle.end(), leftTitle.begin(),
+            [](char c) -> char { return static_cast<char>(std::tolower(static_cast<unsigned char>(c))); });
+
+        std::transform(rightTitle.begin(), rightTitle.end(), rightTitle.begin(),
+            [](char c) -> char { return static_cast<char>(std::tolower(static_cast<unsigned char>(c))); });
+
+
+        if (leftTitle < rightTitle)
+        {
+            books[k++] = leftBooks[i++];
         }
         else {
-            books[k] = rightBooks[j];
-            ++j;
+            books[k++] = rightBooks[j++];
         }
-        ++k;
     }
 
     while (i < n1) {
-        books[k] = leftBooks[i];
-        ++i;
-        ++k;
+        books[k++] = leftBooks[i++];
     }
 
     while (j < n2) {
-        books[k] = rightBooks[j];
-        ++j;
-        ++k;
+        books[k++] = rightBooks[j++];
     }
-}
-
-// --- Custom Search Algorithms ---
-int Book::linearSearchByISBN(const std::vector<Book>& books, const std::string& isbn) {
-    for (size_t i = 0; i < books.size(); ++i) {
-        if (books[i].getISBN() == isbn) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int Book::linearSearchByTitle(const std::vector<Book>& books, const std::string& title) {
-    for (size_t i = 0; i < books.size(); ++i) {
-        if (books[i].getTitle() == title) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int Book::linearSearchByAuthor(const std::vector<Book>& books, const std::string& author) {
-    for (size_t i = 0; i < books.size(); ++i) {
-        if (books[i].getAuthor() == author) {
-            return i;
-        }
-    }
-    return -1;
 }
