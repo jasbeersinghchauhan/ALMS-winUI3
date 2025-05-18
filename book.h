@@ -1,4 +1,4 @@
-#ifndef BOOK_H
+#ifndef BOOK_H  
 #define BOOK_H
 
 #include <pch.h>
@@ -19,8 +19,10 @@ private:
 public:
     // Constructors
     Book();
-    Book(std::string isbn);
-    Book(std::string title, std::string author, std::string isbn, int year, int quantity);
+    Book(const std::string& title, const std::string& author, const std::string& isbn, int year, int quantity);
+    static Book fromTitle(const std::string& title);
+    static Book fromAuthor(const std::string& author);
+    static Book fromISBN(const std::string& isbn);
 
     // Setters
     void setTitle(const std::string& t);
@@ -43,24 +45,20 @@ public:
     std::string insertBook(sql::Connection* con);
     std::string updateBook(sql::Connection* con);
     std::string deleteBook(sql::Connection* con);
-    std::string searchBookByISBN(sql::Connection* con);
-    std::string searchBookByTitle(sql::Connection* con);
-    std::string searchBookByAuthor(sql::Connection* con);
-    std::vector<Book> displayAllBooks(sql::Connection* con);
-    std::vector<Book> getAvailableBooks(sql::Connection* con);
+    std::vector<Book> searchBooksByTitle(sql::Connection* con);
+    std::vector<Book> searchBooksByISBN(sql::Connection* con);
+    std::vector<Book> searchBooksByAuthor(sql::Connection* con);
+    std::vector<Book> displayAllBooks(sql::Connection* con, std::string& error);
+    std::vector<Book> getAvailableBooks(sql::Connection* con, std::string& error);
 
     // Pagination
     std::vector<Book> getPaginatedBooks(sql::Connection* con, int pageNumber, int pageSize);
 
     // Sorting
     static void mergeSort(std::vector<Book>& books);
-    static void mergeSortHelper(std::vector<Book>& books, int left, int right);
-    static void mergeHelper(std::vector<Book>& books, int left, int mid, int right);
+    static void mergeHelper(std::vector<Book>& books, size_t left, size_t mid, size_t right);
+    static void mergeSortHelper(std::vector<Book>& books, size_t left,  size_t right);
 
-    // Custom search algorithms
-    static int linearSearchByISBN(const std::vector<Book>& books, const std::string& isbn);
-    static int linearSearchByTitle(const std::vector<Book>& books, const std::string& title);
-    static int linearSearchByAuthor(const std::vector<Book>& books, const std::string& author);
 };
 
 #endif
