@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="dashboard_page.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:dashboard_page"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="dashboard_page">
+
+    <Grid Background="White" Padding="20">
+        <StackPanel Spacing="20">
+
+            <!-- 🔍 Account Search Section -->
+            <StackPanel BorderBrush="Black">
+                <TextBlock Text="Search Account" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBox Width="300" PlaceholderText="Enter Name or Account ID"/>
+                    <Button Content="Search"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- 🔍 Book Search Section -->
+            <StackPanel>
+                <TextBlock Text="Search Book" FontSize="16" FontWeight="Bold" Margin="10,20,0,5"/>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBox Width="300" PlaceholderText="Enter Title or ISBN"/>
+                    <Button Content="Search"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- 📊 Dashboard Cards -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 📚 Total Books -->
+                <Border Background="#D1E8FF" CornerRadius="12" Margin="10" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="Total Books" FontSize="18" FontWeight="Bold" Foreground="Black"/>
+                        <TextBlock x:Name="TotalBooksText" Text="--" FontSize="26" Margin="0,5,0,0" Foreground="#1E3A8A"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 👤 Total Accounts -->
+                <Border Grid.Column="1" Background="#D1FFD6" CornerRadius="12" Margin="10" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="Total Accounts" FontSize="18" FontWeight="Bold" Foreground="Black"/>
+                        <TextBlock x:Name="TotalAccountsText" Text="--" FontSize="26" Margin="0,5,0,0" Foreground="#065F46"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 📖 Borrowed Books -->
+                <Border Grid.Column="2" Background="#FFEED1" CornerRadius="12" Margin="10" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="Borrowed Books" FontSize="18" FontWeight="Bold" Foreground="Black"/>
+                        <TextBlock x:Name="BorrowedBooksText" Text="--" FontSize="26" Margin="0,5,0,0" Foreground="#92400E"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+        </StackPanel>
+    </Grid>
+
+</Window>
