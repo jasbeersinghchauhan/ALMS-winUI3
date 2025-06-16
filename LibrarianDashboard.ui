@@ -1,0 +1,144 @@
+<Window
+    x:Class="Pages.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="ALMS | Librarian Dashboard">
+
+    <Grid Background="#FAFAFA">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Background="#0B1E3D" Padding="16" Grid.Row="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="📚 ALMS - Librarian Dashboard"
+                           FontSize="24" FontWeight="Bold"
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="20">
+                    <Button Content="📘 Manage Books" Foreground="White" Background="Transparent" FontSize="14" BorderBrush="Transparent"/>
+                    <Button Content="👥 Manage Users" Foreground="White" Background="Transparent" FontSize="14" BorderBrush="Transparent"/>
+                    <Button Content="🧾 Borrowed Records" Foreground="White" Background="Transparent" FontSize="14" BorderBrush="Transparent"/>
+                    <Button Content="🚪 Logout" Foreground="#F28B82" Background="Transparent" FontSize="14" BorderBrush="Transparent"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- CONTENT AREA -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="40,30" HorizontalAlignment="Center" Width="1000" Spacing="35">
+                <TextBlock Text="📚 All Books"
+                           FontSize="28" FontWeight="Bold"
+                           Foreground="#1B1B1B"
+                           HorizontalAlignment="Center"/>
+
+                <!-- Search Area -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <ComboBox x:Name="SearchTypeComboBox" Width="120" SelectedIndex="0">
+                        <ComboBoxItem Content="ISBN"/>
+                        <ComboBoxItem Content="Title"/>
+                        <ComboBoxItem Content="Author"/>
+                    </ComboBox>
+
+                    <TextBox x:Name="SearchBox"
+                             Width="300"
+                             PlaceholderText="Search books..."
+                             Padding="6"
+                             BorderBrush="#CCCCCC"
+                             BorderThickness="1"/>
+
+                    <Button Content="🔍 Search"
+                            Background="#005A9E" Foreground="White"
+                            Padding="6,4" Width="90"
+                            BorderThickness="2"/>
+
+                    <Button Content="❌ Clear"
+                            Background="#D13438" Foreground="White"
+                            Padding="6,4" Width="90"
+                            BorderThickness="2"/>
+                </StackPanel>
+
+                <!-- BOOK LIST -->
+                <ListView x:Name="BookListView"
+                          BorderBrush="#E1E1E1"
+                          BorderThickness="1"
+                          Background="White"
+                          CornerRadius="6"
+                          IsItemClickEnabled="True">
+                    <ListView.Header>
+                        <Grid Background="#F1F4F7" Padding="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="250"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="150"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="ISBN" Grid.Column="0" FontWeight="Bold" TextAlignment="Center"/>
+                            <TextBlock Text="Title" Grid.Column="1" FontWeight="Bold" TextAlignment="Center"/>
+                            <TextBlock Text="Author" Grid.Column="2" FontWeight="Bold" TextAlignment="Center"/>
+                            <TextBlock Text="Available" Grid.Column="3" FontWeight="Bold" TextAlignment="Center"/>
+                            <TextBlock Text="Actions" Grid.Column="4" FontWeight="Bold" TextAlignment="Center"/>
+                        </Grid>
+                    </ListView.Header>
+
+                    <!-- ITEMS -->
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="250"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="{Binding ISBN}" Grid.Column="0" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding Title}" Grid.Column="1" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding Author}" Grid.Column="2" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding Available}" Grid.Column="3" TextAlignment="Center"/>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Column="4" Spacing="5">
+                                    <Button Content="✏ Edit" Padding="4" Background="#0078D4" Foreground="White" Width="60" />
+                                    <Button Content="🗑 Delete" Padding="4" Background="#C50F1F" Foreground="White" Width="60" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Add Book Button -->
+                <Button Content="➕ Add New Book"
+                        Background="#107C10"
+                        Foreground="White"
+                        FontSize="16"
+                        Padding="10,6"
+                        Width="200"
+                        HorizontalAlignment="Center"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- FOOTER -->
+        <Border Background="#0B1E3D" Grid.Row="2" Padding="10">
+            <TextBlock Text="© 2025 Advanced Library Management System | Librarian Portal"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       FontSize="12"/>
+        </Border>
+    </Grid>
+</Window>
