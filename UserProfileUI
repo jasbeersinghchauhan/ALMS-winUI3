@@ -1,0 +1,45 @@
+<Grid Padding="30">
+
+    <StackPanel>
+        <Button Content="← Back"
+                HorizontalAlignment="Left"
+                Background="Transparent"
+                Foreground="Black"
+                FontSize="16"
+                BorderThickness="0"
+                Padding="0,10,0,10"/>
+    </StackPanel>
+
+    <!-- Profile Content -->
+    <StackPanel VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Width="500"
+                Spacing="20">
+        <Border Background="#FFF"
+                CornerRadius="10"
+                Padding="30"
+                BorderBrush="#AAA"
+                BorderThickness="1">
+            <StackPanel Spacing="15">
+                <TextBlock Text="User Profile" FontSize="28" FontWeight="Bold" TextAlignment="Center" />
+
+                <TextBlock Text="Name:"/>
+                <TextBox Text="{Binding Name}" IsReadOnly="True"/>
+
+                <TextBlock Text="Mobile Number:"/>
+                <TextBox Text="{Binding Phone}" IsReadOnly="True"/>
+
+                <TextBlock Text="Gmail:"/>
+                <TextBox Text="{Binding Email}" IsReadOnly="True"/>
+
+                <TextBlock Text="Account ID:"/>
+                <TextBox Text="{Binding AccountId}" IsReadOnly="True"/>
+
+                <Button Content="View Borrowed Books"
+                        HorizontalAlignment="Center"
+                        Background="#3F51B5"
+                        Foreground="White"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</Grid>
