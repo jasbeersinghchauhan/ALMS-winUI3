@@ -1,0 +1,116 @@
+<Grid Background="#F9F9F9">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <Grid Background="#002244" Height="50" Padding="20,0" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="ALMS - Admin Dashboard"
+               Foreground="White"
+               FontSize="18"
+               VerticalAlignment="Center"
+               FontWeight="Bold"/>
+
+        <Button Content="Manage Books" Grid.Column="1" Margin="10,0"
+            Foreground="White" Background="Transparent"/>
+
+        <Button Content="Manage Users" Grid.Column="2" Margin="10,0"
+            Foreground="White" Background="Transparent"/>
+
+        <Button Content="Borrowed Records" Grid.Column="3" Margin="10,0"
+            Foreground="White" Background="Transparent"/>
+
+        <Button Content="Logout" Grid.Column="4" Margin="10,0"
+            Foreground="OrangeRed" Background="Transparent"/>
+    </Grid>
+
+    <!-- 👤 Title Section -->
+    <TextBlock Grid.Row="1" Text="👤 All Accounts"
+           FontSize="24" FontWeight="Bold"
+           Foreground="#2C3E50" Margin="30,20,0,10"/>
+
+    <!-- 🔍 Search + Table Content -->
+    <StackPanel Grid.Row="2" Margin="30,0,30,0">
+        <!-- Search -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <ComboBox Width="120" Margin="0,0,10,0">
+                <ComboBoxItem Content="Account ID" IsSelected="True"/>
+                <ComboBoxItem Content="Username"/>
+                <ComboBoxItem Content="Email"/>
+            </ComboBox>
+
+            <TextBox PlaceholderText="Search accounts..."
+                 Width="250" Margin="0,0,10,0"/>
+
+            <Button Content="🔍 Search" Width="90"
+                Background="#0078D7" Foreground="White"
+                Margin="0,0,10,0"/>
+
+            <Button Content="❌ Clear" Width="90"
+                Background="Red" Foreground="White"/>
+        </StackPanel>
+
+        <!-- Accounts Table -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="500">
+            <ItemsControl x:Name="AccountsListControl" ItemsSource="{Binding Accounts}">
+                <ItemsControl.Template>
+                    <ControlTemplate TargetType="ItemsControl">
+                        <StackPanel>
+                            <!-- Table Header -->
+                            <Grid Background="#E5E5E5" Padding="10"
+                      ColumnDefinitions="Auto,*,*,*,*,Auto">
+                                <TextBlock Text="Account ID" FontWeight="Bold"/>
+                                <TextBlock Text="Name" Grid.Column="1" FontWeight="Bold"/>
+                                <TextBlock Text="Email" Grid.Column="2" FontWeight="Bold"/>
+                                <TextBlock Text="Phone" Grid.Column="3" FontWeight="Bold"/>
+                                <TextBlock Text="Role" Grid.Column="4" FontWeight="Bold"/>
+                                <TextBlock Text="Registered" Grid.Column="5" FontWeight="Bold"/>
+                            </Grid>
+                            <ItemsPresenter/>
+                        </StackPanel>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="White" Margin="0,4" Padding="10" CornerRadius="4">
+                            <Grid ColumnDefinitions="Auto,*,*,*,*,Auto">
+                                <TextBlock Text="{Binding account_id}"/>
+                                <TextBlock Text="{Binding name}" Grid.Column="1"/>
+                                <TextBlock Text="{Binding email}" Grid.Column="2"/>
+                                <TextBlock Text="{Binding phone}" Grid.Column="3"/>
+                                <TextBlock Text="{Binding role}" Grid.Column="4"/>
+
+                                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="5">
+                                    <Button Content="✏️" Width="30" Height="30" Background="#FFC107" Tag="{Binding account_id}" />
+                                    <Button Content="🗑️" Width="30" Height="30" Background="#DC3545" Tag="{Binding account_id}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </StackPanel>
+
+    <Button Grid.Row="3"
+        Content="➕ Add New Account"
+        HorizontalAlignment="Center"
+        Background="Green"
+        Foreground="White"
+        FontWeight="Bold"
+        Padding="12,6"
+        Margin="0,20,0,30"
+        Width="180"/>
+</Grid>
