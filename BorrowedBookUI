@@ -1,0 +1,61 @@
+<Grid>
+    <!-- Background Gradient -->
+    <Grid.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#f0f4f8" Offset="0.0" />
+            <GradientStop Color="#cce0ff" Offset="1.0" />
+        </LinearGradientBrush>
+    </Grid.Background>
+
+    <Grid Padding="30" RowDefinitions="Auto,Auto,*">
+
+        <!-- Back Button -->
+        <Button Content="← Back"
+                Grid.Row="0"
+                HorizontalAlignment="Left"
+                Margin="0,0,0,20"
+                Padding="10,5"
+                Background="#0078D7"
+                Foreground="White"
+                FontWeight="SemiBold"
+                Width="90"
+                CornerRadius="6"/>
+
+        <!-- Table Header -->
+        <Grid Grid.Row="1"
+              Background="#2C3E50"
+              Padding="10"
+              CornerRadius="6"
+              ColumnDefinitions="*,*,*,*,*,*">
+            <TextBlock Text="Borrow ID" Grid.Column="0" Foreground="White" FontWeight="Bold"/>
+            <TextBlock Text="Account ID" Grid.Column="1" Foreground="White" FontWeight="Bold"/>
+            <TextBlock Text="Book ID" Grid.Column="2" Foreground="White" FontWeight="Bold"/>
+            <TextBlock Text="Borrow Date" Grid.Column="3" Foreground="White" FontWeight="Bold"/>
+            <TextBlock Text="Return Date" Grid.Column="4" Foreground="White" FontWeight="Bold"/>
+            <TextBlock Text="Returned" Grid.Column="5" Foreground="White" FontWeight="Bold"/>
+        </Grid>
+
+        <!-- Scrollable Table -->
+        <ScrollViewer Grid.Row="2" Margin="0,15,0,0">
+            <ItemsControl ItemsSource="{Binding BorrowedBooks}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="#ffffff"
+                                CornerRadius="4"
+                                Margin="0,4,0,4"
+                                Padding="6">
+                            <Grid ColumnDefinitions="*,*,*,*,*,*">
+                                <TextBlock Text="{Binding BorrowId}" Grid.Column="0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding AccountId}" Grid.Column="1" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding BookId}" Grid.Column="2" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding BorrowDate}" Grid.Column="3" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding ReturnDate}" Grid.Column="4" VerticalAlignment="Center"/>
+                                <CheckBox IsChecked="{Binding Returned}" IsEnabled="False" Grid.Column="5" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Grid>
