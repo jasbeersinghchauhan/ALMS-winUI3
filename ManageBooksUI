@@ -1,0 +1,90 @@
+<StackPanel Padding="20" Background="White" Spacing="20">
+
+    <Button x:Name="BackButton"
+            Content="← Back"
+            HorizontalAlignment="Left"
+            Width="90"
+            Padding="10,5"
+            Margin="0,0,0,10"
+            Background="#0078D7"
+            Foreground="White"
+            FontWeight="SemiBold"
+            CornerRadius="6"/>
+
+    <!-- 📚 Title -->
+    <TextBlock Text="📚 All Books"
+               FontSize="30"
+               FontWeight="Bold"
+               HorizontalAlignment="Center"/>
+
+    <!-- 🔍 Search Bar -->
+    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+        <ComboBox x:Name="SearchTypeComboBox" Width="120" SelectedIndex="0">
+            <ComboBoxItem Content="ISBN"/>
+            <ComboBoxItem Content="Title"/>
+            <ComboBoxItem Content="Author"/>
+        </ComboBox>
+        <TextBox x:Name="SearchTextBox" Width="300" PlaceholderText="Search books..."/>
+        <Button x:Name="SearchButton" Content="🔍 Search"
+                Background="#005A9E" Foreground="White" Padding="6,4" Width="90" BorderThickness="2"/>
+        <Button x:Name="ClearButton" Content="❌ Clear"
+                Background="#D13438" Foreground="White" Padding="6,4" Width="90" BorderThickness="2"/>
+    </StackPanel>
+
+    <!-- 🧾 Table Headers -->
+    <Grid Background="#EEE" Padding="10" CornerRadius="4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="ISBN" Grid.Column="0" FontWeight="Bold"/>
+        <TextBlock Text="Title" Grid.Column="1" FontWeight="Bold"/>
+        <TextBlock Text="Author" Grid.Column="2" FontWeight="Bold"/>
+        <TextBlock Text="Available" Grid.Column="3" FontWeight="Bold"/>
+        <TextBlock Text="Actions" Grid.Column="4" FontWeight="Bold"/>
+    </Grid>
+
+    <!-- 📚 Book List -->
+    <ListView x:Name="BooksListView" SelectionMode="None">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <Grid Padding="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding ISBN}" Grid.Column="0"/>
+                    <TextBlock Text="{Binding Title}" Grid.Column="1"/>
+                    <TextBlock Text="{Binding Author}" Grid.Column="2"/>
+                    <TextBlock Text="{Binding Available, Converter={StaticResource BooleanToYesNoConverter}}" Grid.Column="3"/>
+
+                    <StackPanel Orientation="Horizontal" Grid.Column="4" Spacing="10">
+                        <Button Content="✏ Edit"
+                                Padding="6,2"
+                                Width="60"/>
+                        <Button Content="🗑 Delete"
+                                Padding="6,2"
+                                Width="60"
+                                Background="Red"
+                                Foreground="White"/>
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+
+    <!-- ➕ Add Book Button -->
+    <Button Content="➕ Add New Book"
+            Background="Green"
+            Foreground="White"
+            Width="150"
+            Padding="6,4"
+            HorizontalAlignment="Center"/>
+</StackPanel>
