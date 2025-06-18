@@ -9,5 +9,5 @@ private:
 public:
 	Login(const std::string& user, const std::string& pass);
 
-	std::string authenticate(std::function<void(std::string)> showMessage) {};
+	std::string authenticate(std::function<void(std::string)> showMessage);
 };
