@@ -1,0 +1,35 @@
+CREATE DATABASE IF NOT EXISTS library_db;
+USE library_db;
+
+CREATE TABLE IF NOT EXISTS accounts (
+    account_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    role ENUM('user', 'admin', 'librarian') NOT NULL,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS books(
+	book_id INT AUTO_INCREMENT PRIMARY KEY,
+	isbn VARCHAR(15) UNIQUE,
+	title VARCHAR(100),
+	author VARCHAR(100),
+	published_year INT,
+	quantity INT,
+	added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS borrowed_books (
+    borrow_id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT NOT NULL,
+    book_id INT NOT NULL,
+    borrow_date DATE DEFAULT (CURRENT_DATE),
+    return_date DATE,
+    returned BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (account_id) REFERENCES accounts(account_id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (book_id) REFERENCES books(book_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
